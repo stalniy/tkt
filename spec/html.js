@@ -1,4 +1,4 @@
-describe("enhanced html binding", function () {
+describe("Enhanced html binding", function () {
   var domNode;
   beforeEach(function () {
     domNode = document.createElement('div');
