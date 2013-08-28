@@ -1,5 +1,4 @@
 (function (htmlBinding) {
-  console.log(htmlBinding)
   htmlBinding.update = (function (_super) {
     return function (element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext) {
       var bindings = allBindingsAccessor();
