@@ -1,16 +1,16 @@
-function (ko) {
+(function (ko) {
   var unwrap = ko.utils.unwrapObservable;
   var formats = {
     price: function (v, options) {
       var sign = unwrap(options.priceSign) || "$";
-      v = Number(v) || 0;
+      var value = (Number(v) || 0).toFixed('precision' in options ? options.precision : 2);
 
-      if (v < 0) {
-        v *= -1;
-        sign = '- ' + sign;
+      if (options.priceBefore) {
+        value += ' ' + sign;
+      } else {
+        value = value < 0 ? '- ' + sign + (value * -1) : sign + value;
       }
-
-      return sign + v.toFixed('precision' in options ? options.precision : 2);
+      return value;
     },
 
     options: function (id, options) {
@@ -22,21 +22,22 @@ function (ko) {
       return String(v || options.none || 'None');
     },
 
-    float: function (v, options) {
-      return parseFloat(String(v).replace(/,/g, '.').replace(/\s+/g, '')) || 0;
+    'float': function (v, options) {
+      var value = parseFloat(String(v).replace(/,/g, '.').replace(/\s+/g, '')) || 0;
+      return value.toFixed('precision' in options ? options.precision : 2);
     },
 
     'int': function (v, options) {
-      return parseInt(v, options.intBase || 10);
+      return parseInt(v, options.intBase || 10) || 0;
     },
 
     number: function (v) {
-      return +v || 0;
+      return Number(v) || 0;
     },
 
     percentage: function (v, options) {
       if (!isNaN(+v)) {
-        return this.floatNumber(v).toFixed('precision' in options ? options.precision : 2) + '%'
+        return this['float'](v, options) + '%'
       } else {
         return v
       }
@@ -56,23 +57,29 @@ function (ko) {
     return this;
   }
 
-  function addFormaterIn(_super) {
-    return {
-      addFormat: addFormat,
+  function removeFormat(name) {
+    if (formats[name]) {
+      delete formats[name];
+    }
+  }
 
-      update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext) {
+  function addFormaterIn(binding) {
+    binding.removeFormat = removeFormat;
+    binding.addFormat = addFormat;
+    binding.update = (function (_super) {
+      return function (element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext) {
         var bindings = allBindingsAccessor(), format = unwrap(bindings.showAs);
 
         if (formats[format]) {
           valueAccessor = formats[format].bind(formats, unwrap(valueAccessor()), bindings);
         }
-        _super.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext);
+        _super(element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext);
       }
-    }
+    })(binding.update);
   }
 
   var bindings = ['text', 'html'];
   ko.utils.arrayForEach(bindings, function (bindingName) {
-    ko.bindingHandlers[bindingHandlers] = addFormaterIn(ko.bindingHandlers[bindingHandlers]);
+    addFormaterIn(ko.bindingHandlers[bindingName]);
   });
 })(ko);
