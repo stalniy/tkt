@@ -1,17 +1,13 @@
-require(['ko'], function (ko) {
-  ko.bindingHandlers.html = (function (oldHtml) {
-    return {
-      init: oldHtml.init,
-      update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext) {
-        var allBindings = allBindingsAccessor(), context = allBindings.bindContext;
+(function (htmlBinding) {
+  console.log(htmlBinding)
+  htmlBinding.update = (function (_super) {
+    return function (element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext) {
+      var bindings = allBindingsAccessor();
 
-        if (context) {
-          ko.utils.setHtml(element, '<div></div>');
-          element = element.firstChild;
-        }
-        oldHtml.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext);
-        context && ko.applyBindings(bindingsContext, element);
+      _super.apply(this, arguments);
+      if (bindings.withContext) {
+        ko.applyBindingsToDescendants(bindingsContext, element);
       }
     }
-  })(ko.bindingHandlers.html);
-});
+  })(htmlBinding.update);
+})(ko.bindingHandlers.html);
