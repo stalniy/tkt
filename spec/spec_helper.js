@@ -21,6 +21,20 @@
     return cleanedHtml === expectedHtml;
   };
 
+  jasmine.Matchers.prototype.toContainCssClass = function (expectedClass) {
+    if (this.actual.length && !this.actual.nodeType) {
+      var cssClasses = ko.utils.arrayMap(this.actual, function (node) { return node.className });
+    } else {
+      var cssClasses = [ this.actual.className ];
+    }
+    this.actual = cssClasses;
+    var result = cssClasses.length > 0;
+    ko.utils.arrayForEach(cssClasses, function (klass) {
+      result = result && (' ' + klass + ' ').indexOf(expectedClass) !== -1
+    });
+    return result;
+  };
+
   var sharedExamples = {};
   window.sharedExamplesFor = function (name, executor) {
     sharedExamples[name] = executor;
