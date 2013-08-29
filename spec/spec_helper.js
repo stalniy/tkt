@@ -30,7 +30,7 @@
     this.actual = cssClasses;
     var result = cssClasses.length > 0;
     ko.utils.arrayForEach(cssClasses, function (klass) {
-      result = result && (' ' + klass + ' ').indexOf(expectedClass) !== -1
+      result = result && (' ' + klass + ' ').indexOf(' ' + expectedClass + ' ') !== -1
     });
     return result;
   };
