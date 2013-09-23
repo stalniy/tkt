@@ -1,60 +1,32 @@
-require(['ko', 'jquery', 'utils'], function (ko, $, utils) {
-  function callbackFor(viewModel, method) {
-    return function () {
-      var node = $(this), parentViewModel = ko.contextFor(node.get(0)).$parent;
-      method.call(viewModel, node.children(':first-child'), parentViewModel, node);
-    };
-  }
-
+(function (ko, $) {
+  var unwrap = ko.utils.unwrapObservable;
   var scopes = {};
-  function setExpandedObservable(options) {
-    scopes[options.inScopeOf] = options.when;
-  }
 
-  function getExpandedObservable(options) {
-    return scopes[options.inScopeOf];
-  }
+  ko.bindingHandlers.collapse = {
+    init: function (node, accessor) {
+      var options  = accessor(), domNode  = $(node);
 
-  function toggleExpandedObservable(options) {
-    var activeObservable = getExpandedObservable(options);
-    if (activeObservable && ko.isObservable(activeObservable) && activeObservable != options.when) {
-      activeObservable(false);
-    }
-    setExpandedObservable(options);
-  }
-
-  function collapse(domNode, options) {
-    domNode.stop(true, true);
-    if (options.when) {
-      domNode.slideDown(options.duration, options.then);
-    } else if (domNode.is(':visible')) {
-      domNode.slideUp(options.duration, options.then);
-    }
-  }
-
-  ko.bindingHandlers.slideVisible = {
-    init: function (node, accessor, allBindings, viewModel) {
-      var
-        options  = accessor(),
-        isOpened = ko.utils.unwrapObservable(options.when),
-        domNode  = $(node);
-
-      if (!isOpened) {
+      if (!unwrap(options.when)) {
         domNode.hide();
-      } else if (options.inScopeOf) {
-        setExpandedObservable(options);
+      }
+      if (options.inScopeOf) {
+        if (!ko.isObservable(options.when)) {
+          throw new Error("Option 'when' should be an observable if 'inScopeOf' is specified");
+        }
+        toggleExpandedObservable(options);
+        ko.utils.domNodeDisposal.addDisposeCallback(node, function () {
+          delete scopes[options.inScopeOf];
+        });
       }
     },
 
     update: function(node, accessor, allBindings, viewModel) {
-      var
-        domNode = $(node),
-        realOptions = accessor(),
-        options = ko.utils.extend(ko.toJS(realOptions), {
-          duration: 300
-        });
+      var domNode = $(node), options = accessor();
+      var isOpened = unwrap(options.when);
 
-      if (options.when && typeof options.call == 'function') {
+      options.duration = options.duration || 300;
+
+      if (typeof options.call == 'function' && isOpened) {
         callbackFor(viewModel, options.call).call(node);
       }
 
@@ -62,10 +34,34 @@ require(['ko', 'jquery', 'utils'], function (ko, $, utils) {
         options.then = callbackFor(viewModel, options.then);
       }
 
-      if (options.inScopeOf && options.when) {
-        toggleExpandedObservable(realOptions);
+      if ('inScopeOf' in options && isOpened) {
+        toggleExpandedObservable(options);
       }
       collapse(domNode, options);
     }
   };
-});
+
+  function callbackFor(viewModel, method) {
+    return function () {
+      var node = $(this), parentViewModel = ko.contextFor(node.get(0)).$parent;
+      method.call(viewModel, node.children(':first-child'), parentViewModel, node);
+    };
+  }
+
+  function toggleExpandedObservable(options) {
+    var activeObservable = scopes[options.inScopeOf];
+    if (activeObservable && ko.isObservable(activeObservable) && activeObservable != options.when) {
+      activeObservable(false);
+    }
+    scopes[options.inScopeOf] = options.when;
+  }
+
+  function collapse(domNode, options) {
+    domNode.stop(true, true);
+    if (unwrap(options.when)) {
+      domNode.slideDown(options.duration, options.then);
+    } else if (domNode.is(':visible')) {
+      domNode.slideUp(options.duration, options.then);
+    }
+  }
+})(ko, jQuery);

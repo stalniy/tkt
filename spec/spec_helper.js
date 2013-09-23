@@ -21,6 +21,14 @@
     return cleanedHtml === expectedHtml;
   };
 
+  jasmine.Matchers.prototype.toBeVisible = function () {
+    var notText = this.isNot ? " not" : "";
+    this.message = function () {
+      return "Expected node to be " + notText + " visible";
+    };
+    return this.actual.offsetWidth !== 0 && this.actual.offsetHeight !== 0;
+  };
+
   jasmine.Matchers.prototype.toContainCssClass = function (expectedClass) {
     if (this.actual.length && !this.actual.nodeType) {
       var cssClasses = ko.utils.arrayMap(this.actual, function (node) { return node.className });
