@@ -1,6 +1,6 @@
 (function (ko, $) {
   var unwrap = ko.utils.unwrapObservable;
-  var scopes = {};
+  var scopes = {}, scopeCounter = {};
 
   ko.bindingHandlers.collapse = {
     init: function (node, accessor) {
@@ -14,8 +14,13 @@
           throw new Error("Option 'when' should be an observable if 'inScopeOf' is specified");
         }
         toggleExpandedObservable(options);
+        scopeCounter[options.inScopeOf] = scopeCounter[options.inScopeOf] || 0;
+        scopeCounter[options.inScopeOf]++;
         ko.utils.domNodeDisposal.addDisposeCallback(node, function () {
-          delete scopes[options.inScopeOf];
+          if (--scopeCounter[options.inScopeOf] === 0) {
+            delete scopes[options.inScopeOf];
+            delete scopeCounter[options.inScopeOf];
+          }
         });
       }
     },
