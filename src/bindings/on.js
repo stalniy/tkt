@@ -33,7 +33,7 @@
   function assembleValueFor(node, valueDef) {
     var domNode = $(node), value;
     if (valueDef) {
-      value = domNode[valueDef[0]].apply(domNode, valueDef.slice(1));
+      value = domNode[valueDef.shift()].apply(domNode, valueDef);
     } else {
       value = domNode.data();
       if (value.bind) {
