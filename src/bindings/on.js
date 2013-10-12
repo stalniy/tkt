@@ -1,77 +1,111 @@
 (function (ko, $) {
   var domData = ko.utils.domData;
+  var contextPositionKey = '_tkt_context_index';
+  var handlersNamespace  = '._tkt_event_handler';
 
-  ko.bindingHandlers.on = {
+  var binding = {
     init: function (element, valueAccessor, allBindings, viewModel) {
-      var config = valueAccessor(), domNode = $(element);
+      var config = valueAccessor(), domNode = $(element), handler;
 
       for (var rule in config) {
-        if (config.hasOwnProperty(rule)) {
-          var handler = createEventHandlerFor(config, rule);
+        if (config.hasOwnProperty(rule) && !(rule in binding.valueDefs)) {
+          handler = createEventHandlerFor(config, rule);
           rule = rule.split(/\s+/, 2);
-          if (rule[1]) {
-            domNode.on(rule[0], rule[1], handler);
-            ko.utils.domNodeDisposal.addDisposeCallback(domNode[0], removeEventHandlers);
-          }
+          domNode.on(rule[0] + handlersNamespace, rule[1], handler);
         }
+      }
+      ko.utils.domNodeDisposal.addDisposeCallback(domNode[0], removeEventHandlers);
+    },
+
+    valueDefs: {
+
+      data: function (element, context, event) {
+        var domNode = $(element);
+
+        if (this.value === '*') {
+          var data = domNode.data();
+
+          if (data.bind) {
+            delete data.bind;
+          }
+          return data;
+        }
+        return domNode.data(this.value) || domNode.attr(this.value);
+      },
+
+      'default': function (element, context, event) {
+        return [ context.$data, context.$parent ];
       }
     }
   };
 
-  function createValueDefFrom(config) {
-    var def;
-    if (config.to) {
-      def = [ config.to ]
-    } else if (config.on) {
-      def = ['attr', config.on]
-    } else if (config.data || config.fromData) {
-      def = ['data', (config.data || config.fromData)]
-    }
-    return def;
-  }
+  ko.utils.arrayForEach('with,to,by,of,from,as,on,in,at'.split(','), function (word) {
+    binding.valueDefs[word] = binding.valueDefs.data;
+  });
 
-  function assembleValueFor(node, valueDef) {
-    var domNode = $(node), value;
-    if (valueDef) {
-      value = domNode[valueDef.shift()].apply(domNode, valueDef);
-    } else {
-      value = domNode.data();
-      if (value.bind) {
-        delete value.bind;
+
+  ko.bindingHandlers.on = binding;
+
+
+  var defaultValueBuilder = { buildFrom: binding.valueDefs['default'] };
+
+  function detectBuilderFrom(config) {
+    var defs = binding.valueDefs;
+    for (var defName in defs) {
+      if (defs.hasOwnProperty(defName) && defName in config) {
+        return {
+          buildFrom : defs[defName],
+          value     : config[defName]
+        }
       }
     }
-    return value;
+
+    return defaultValueBuilder;
   }
 
   function createEventHandlerFor(config, rule) {
     var
       methodName = config[rule],
-      valueDef   = createValueDefFrom(config);
+      builder = detectBuilderFrom(config);
+
+    config = rule = null;
 
     return function (event) {
       var element  = event.currentTarget;
       var context  = ko.contextFor(this);
       var scopes   = context.$parents.slice(0);
-      var position = domData.get(element, 'contextHandlerPosition');
+      var position = domData.get(element, contextPositionKey);
 
-      if (!position) {
-        position = _.lookupContextWithMethodPosition(context, methodName);
-        domData.set(element, 'contextHandlerPosition', position);
-      }
       scopes.unshift(context.$data);
-
-      var scope = scopes[position], result;
-      if (config.passContext) {
-        result = scope[methodName].call(scope, context.$data, context.$parent);
-      } else {
-        result = scope[methodName].call(scope, assembleValueFor(this, valueDef), context, event);
+      if (!position) {
+        position = getPositionOfContextWith(methodName, scopes);
+        domData.set(element, contextPositionKey, position);
       }
 
-      if (result !== true) { event.preventDefault() }
+      var scope = scopes[position];
+      var value = builder.buildFrom(element, context, event);
+      var result = scope[methodName].apply(scope, value.push && value.pop ? value : [ value ]);
+
+      if (result !== true) {
+        event.preventDefault();
+      }
     };
   }
 
   function removeEventHandlers(element) {
-    $(element).off();
+    $(element).off(handlersNamespace);
+  }
+
+  function getPositionOfContextWith(methodName, scopes) {
+    var i = 0, count = scopes.length, scope;
+
+    do {
+      scope = scopes[i];
+    } while (!(scope[methodName] && scope[methodName].apply) && ++i < count);
+
+    if (i === count) {
+      throw new Error('Unknown method "' + methodName + '" in context');
+    }
+    return i;
   }
 })(ko, jQuery);
