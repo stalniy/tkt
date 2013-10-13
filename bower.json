@@ -1,0 +1,14 @@
+{
+  "name": "tkt",
+  "version": "0.0.1",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "vendor",
+    "spec"
+  ],
+  "dependencies": {
+    "jquery": ">= 1.7.0",
+    "knockout.js": ">= 2.1.0"
+  }
+}
