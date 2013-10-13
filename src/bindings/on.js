@@ -22,11 +22,11 @@
     valueDefs: {
 
       collected: function (element, context, event) {
-        var config = domData.get(element, collectedDefsKey);
+        var config = domData.get(event.delegateTarget, collectedDefsKey);
 
         if (!config) {
           var config = parseCollectedConfig(this.value);
-          domData.set(element, collectedDefsKey, config);
+          domData.set(event.delegateTarget, collectedDefsKey, config);
         }
 
         var domNode = $(element);
