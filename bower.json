@@ -1,10 +1,11 @@
 {
   "name": "tkt",
   "version": "0.0.1",
+  "main": "tkt-0.0.1.min.js",
   "ignore": [
     "**/.*",
     "node_modules",
-    "vendor",
+    "bower_components",
     "spec"
   ],
   "dependencies": {
