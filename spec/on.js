@@ -132,6 +132,14 @@ describe("'on' binding", function () {
       expect(scope.runHandler.mostRecentCall.args).toEqual([ links.first().attr('title') + '-asc', links.eq(1).attr('title') + '-desc']);
     })
 
+    it ("resets collected attributes if specified key isn't pressed", function () {
+      applyBindingTo(domNode, { 'click a': 'runHandler', collected: 'title using altKey' });
+      var links = triggerEventWithPressed('altKey');
+      links.eq(1).trigger(clickEventWithPressed('shiftKey'));
+
+      expect(scope.runHandler.mostRecentCall.args).toEqual([ links.eq(1).attr('title') ]);
+    })
+
     function triggerEventWithPressed(keyName) {
       var links = domNode.find('a');
       links.first().trigger(clickEventWithPressed(keyName));
