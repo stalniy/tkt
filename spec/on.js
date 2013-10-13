@@ -78,14 +78,6 @@ describe("'on' binding", function () {
       domNode.find('a').trigger('click');
       expect(scope.runHandler).not.toHaveBeenCalled();
     })
-
-    it ("removes only handlers which were added by 'on' binding", function () {
-      var handler = jasmine.createSpy('customEventHandler')
-      domNode.on('click', handler);
-      ko.cleanNode(domNode.get(0));
-      domNode.find('a').trigger('click');
-      expect(handler).toHaveBeenCalled();
-    })
   })
 
   describe("when 'data' option is specified", function () {
@@ -175,11 +167,19 @@ describe("'on' binding", function () {
   })
 
   function applyBindingTo(domNode, binding, context) {
-    ko.applyBindingsToNode(domNode.get(0), { on: binding }, context || buildContext(childScope, scope));
+    ko.applyBindingsToNode(domNode.get(0), { on: binding, contextify: !context }, context || scope);
   }
 
-  function buildContext(context, parentContext) {
-    var $parent = new ko.bindingContext(parentContext);
-    return $parent.createChildContext(context);
-  }
+  ko.bindingHandlers.contextify = {
+    init: function (element, valueAccessor, allBindingsAccessor, scope, context) {
+      if (valueAccessor()) {
+        var childContext = context.createChildContext(childScope);
+
+        $(element).children().each(function () {
+          ko.applyBindings(childContext, this);
+        });
+        return { controlsDescendantBindings: true };
+      }
+    }
+  };
 })
