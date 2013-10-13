@@ -2,6 +2,8 @@
   var domData = ko.utils.domData;
   var contextPositionKey = '_tkt_context_index';
   var handlersNamespace  = '._tkt_event_handler';
+  var collectedValuesKey = '_tkt_collected_values';
+  var collectedDefsKey   = '_tkt_collected_defs';
 
   var binding = {
     init: function (element, valueAccessor, allBindings, viewModel) {
@@ -18,6 +20,28 @@
     },
 
     valueDefs: {
+
+      collected: function (element, context, event) {
+        var config = domData.get(element, collectedDefsKey);
+
+        if (!config) {
+          var config = parseCollectedConfig(this.value);
+          domData.set(element, collectedDefsKey, config);
+        }
+
+        var domNode = $(element);
+        var collectedValues = domData.get(event.delegateTarget, collectedValuesKey);
+        var newValue = domNode.attr(config.attr);
+
+        if (!collectedValues || !event[config.key]) {
+          collectedValues = [];
+        }
+
+        toggleValueIn(collectedValues, newValue, config.toggle);
+        domData.set(event.delegateTarget, collectedValuesKey, collectedValues);
+
+        return collectedValues;
+      },
 
       data: function (element, context, event) {
         var domNode = $(element);
@@ -36,6 +60,10 @@
       'default': function (element, context, event) {
         return [ context.$data, context.$parent ];
       }
+    },
+
+    options: {
+      toggleValueSeparator: '-'
     }
   };
 
@@ -107,5 +135,43 @@
       throw new Error('Unknown method "' + methodName + '" in context');
     }
     return i;
+  }
+
+  function parseCollectedConfig(value) {
+    var parsedValue = value.trim().match(/^(\S+)\s+using\s+(\w+)(?:\s+and\s+toggle\s+with\s+(\w+)(?:\s+or\s+(\w+))?)?$/i);
+
+    if (!parsedValue) {
+      throw new Error("'on' binding: invalid definition of 'collected' option.");
+    }
+    return {
+      attr   : parsedValue[1],
+      key    : parsedValue[2],
+      toggle : parsedValue[3] ? parsedValue.slice(3) : null
+    };
+  }
+
+  function toggleValueIn(array, value, toggleSuffixes) {
+    var toggleSeparator = binding.options.toggleValueSeparator;
+    var currentValueIndex = -1, count = array.length, currentValue;
+
+    while (++currentValueIndex < count && String(array[currentValueIndex]).indexOf(value) !== 0);
+
+    currentValue = array[currentValueIndex];
+    toggleSuffixes = toggleSuffixes || [];
+
+    if (currentValue) {
+      currentValue = currentValue.split(toggleSeparator);
+      var currentSuffix    = currentValue[1] || '';
+      var lastToggleSuffix = toggleSuffixes[1] || '';
+
+      currentValue[1] = currentSuffix === lastToggleSuffix ? toggleSuffixes[0] : lastToggleSuffix;
+      if (!currentValue[1]) {
+        currentValue.pop();
+      }
+      array[currentValueIndex] = currentValue.join(toggleSeparator);
+    } else {
+      currentValue = toggleSuffixes[1] ? value + toggleSeparator + toggleSuffixes[0] : value;
+      array.push(currentValue);
+    }
   }
 })(ko, jQuery);

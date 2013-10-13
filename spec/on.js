@@ -5,7 +5,10 @@ describe("'on' binding", function () {
   var noop = function (){};
 
   beforeEach(function () {
-    domNode = $('<div><a data-id="1" title="test" data-name="test">test</a></div>');
+    domNode = $('<div>' +
+      '<a data-id="1" title="test1" data-name="test1">test 1</a>' +
+      '<a data-id="2" title="test2" data-name="test2">test 2</a>' +
+    '</div>');
     scope = { runHandler: noop };
     childScope = { runChildHandler: noop };
     spyOn(scope, 'runHandler');
@@ -103,7 +106,44 @@ describe("'on' binding", function () {
       var data = domNode.find('a').trigger('click').data();
       expect(childScope.runChildHandler).toHaveBeenCalledWith(data);
     })
+  })
 
+  describe("when 'collected' option is specified", function () {
+    it ("collects specified attributes if specified key is pressed", function () {
+      applyBindingTo(domNode, { 'click a': 'runHandler', collected: 'data-id using shiftKey' });
+      var links = triggerEventWithPressed('shiftKey');
+
+      expect(scope.runHandler.mostRecentCall.args).toEqual([ links.first().attr('data-id'), links.eq(1).attr('data-id')]);
+    })
+
+    it ("collects attributes and add or remove their suffix", function () {
+      applyBindingTo(domNode, { 'click a': 'runHandler', collected: 'title using ctrlKey and toggle with desc' });
+      var links = triggerEventWithPressed('ctrlKey');
+      links.first().trigger(clickEventWithPressed('ctrlKey'));
+
+      expect(scope.runHandler.mostRecentCall.args).toEqual([ links.first().attr('title') + '-desc', links.eq(1).attr('title')]);
+    })
+
+    it ("collects attributes and toggles their suffix", function () {
+      applyBindingTo(domNode, { 'click a': 'runHandler', collected: 'title using altKey and toggle with asc or desc' });
+      var links = triggerEventWithPressed('altKey');
+      links.eq(1).trigger(clickEventWithPressed('altKey'));
+
+      expect(scope.runHandler.mostRecentCall.args).toEqual([ links.first().attr('title') + '-asc', links.eq(1).attr('title') + '-desc']);
+    })
+
+    function triggerEventWithPressed(keyName) {
+      var links = domNode.find('a');
+      links.first().trigger(clickEventWithPressed(keyName));
+      links.eq(1).trigger(clickEventWithPressed(keyName));
+      return links;
+    }
+
+    function clickEventWithPressed(keyName) {
+      var event = $.Event("click");
+      event[keyName] = true;
+      return event;
+    }
   })
 
   describe ("when lookups for specified method", function () {
