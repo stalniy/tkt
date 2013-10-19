@@ -4,8 +4,7 @@ The Knockout Tools
 This library includes the most useful functionality for development with knockout: custom bindings and useful tools.
 Also it includes shim for `Object.create`, `Array.isArray` and `String.trim` methods. For more information check [wiki](https://github.com/stalniy/tkt/wiki) pages.
 
-Installation
-===
+## Installation
 
 Using bower: `bower install tkt`
 
@@ -20,7 +19,6 @@ grunt # or grunt test if you want just test the package
 ```
 If you use knockout version older than 2.2 you need to run `grunt for-old-ko`
 
-License
-===
+## License
 
 Released under the [MIT](http://www.opensource.org/licenses/MIT) License
