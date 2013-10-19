@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com/stalniy/tkt.git"
+    "url": "git@github.com:stalniy/tkt.git"
   },
   "keywords": [
     "knockout",
