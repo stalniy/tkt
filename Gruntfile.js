@@ -80,4 +80,5 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', ['bower', 'jasmine:source', 'concat:ko.2.2.0', 'build', 'uglify', 'jasmine:assembled']);
   grunt.registerTask('test', ['bower', 'jasmine:source']);
+  grunt.registerTask("for-old-ko", ['bower', 'jasmine:source', 'concat:ko.2.1.0', 'build', 'uglify', 'jasmine:assembled'])
 };
