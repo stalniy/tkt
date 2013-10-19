@@ -221,9 +221,9 @@ describe("Content formatting for html and text bindings", function () {
         expect(this.domNode).toContainHtml('<span class="icon-check"></span>');
       })
 
-      it ("shows span with class 'icon-remove' if value is falsy", function () {
+      it ("shows span with class 'icon-unckeck' if value is falsy", function () {
         ko.applyBindingsToNode(this.domNode, { html: false, showAs: 'boolIcon' });
-        expect(this.domNode).toContainHtml('<span class="icon-remove"></span>');
+        expect(this.domNode).toContainHtml('<span class="icon-unckeck"></span>');
       })
     })
   })

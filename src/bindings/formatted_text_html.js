@@ -44,7 +44,7 @@
     },
 
     boolIcon: function (v) {
-      return '<span class="icon-' + (v ? 'check' : 'remove' ) + '"></span>';
+      return '<span class="icon-' + (v ? 'check' : 'unckeck' ) + '"></span>';
     },
 
     bool: function (v) {
