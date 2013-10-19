@@ -1,7 +1,7 @@
 (function (ko, $) {
   var domData = ko.utils.domData;
   var contextPositionKey = '_tkt_context_index';
-  var handlersNamespace  = '._tkt_event_handler';
+  var handlersNamespace  = '._tkt_on_event_handler';
   var collectedValuesKey = '_tkt_collected_values';
   var collectedDefsKey   = '_tkt_collected_defs';
 
@@ -10,7 +10,7 @@
       var config = valueAccessor(), domNode = $(element), handler;
 
       for (var rule in config) {
-        if (config.hasOwnProperty(rule) && !(rule in binding.valueDefs)) {
+        if (config.hasOwnProperty(rule) && !(rule in binding.valueDefs) && typeof config[rule] === 'string') {
           handler = createEventHandlerFor(config, rule);
           rule = rule.split(/\s+/, 2);
           domNode.on(rule[0] + handlersNamespace, rule[1], handler);
