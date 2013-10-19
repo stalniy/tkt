@@ -43,6 +43,10 @@
     return result;
   };
 
+  jasmine.Matchers.prototype.toBeInstanceOf = function (object) {
+    return this.actual instanceof object;
+  };
+
   var sharedExamples = {};
   window.sharedExamplesFor = function (name, executor) {
     sharedExamples[name] = executor;

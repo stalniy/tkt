@@ -20,7 +20,7 @@ module.exports = function (grunt) {
       },
 
       source: {
-        src: 'src/**/*.js'
+        src: [ 'src/shim.js', 'src/utils.js', 'src/oop.js', 'src/bindings/*.js' ]
       },
 
       assembled: {
@@ -34,12 +34,12 @@ module.exports = function (grunt) {
       },
 
       'ko.2.1.0': {
-        src:  [ 'src/utils.js', 'src/bindings/*.js' ],
+        src:  [ 'src/shim.js', 'src/utils.js', 'src/oop.js', 'src/bindings/*.js' ],
         dest: 'build/tkt-raw.js'
       },
 
       'ko.2.2.0': {
-        src:  [ 'src/utils.js', 'src/bindings/*.js', '!src/bindings/css.js' ],
+        src:  [ 'src/shim.js', 'src/utils.js', 'src/oop.js', 'src/bindings/*.js', '!src/bindings/css.js' ],
         dest: 'build/tkt-raw.js'
       }
     },

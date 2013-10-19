@@ -1,13 +1,13 @@
 {
   "name": "tkt",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "The knockout tools: common bindings and useful utilities",
   "scripts": {
     "test": "grunt test"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:stalniy/tkt.git"
+    "url": "git@github.com/stalniy/tkt.git"
   },
   "keywords": [
     "knockout",
