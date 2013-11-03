@@ -5,7 +5,7 @@ module.exports = function (grunt) {
     "    define([\"knockout\", \"jquery\"], factory);\n" +
     "} else {\n" +
     "   // No module loader (plain <script> tag) - put directly in global namespace\n" +
-    "   ko.tkt = factory(window.ko, jQuery);\n" +
+    "   ko.tkt = factory(ko, jQuery);\n" +
     "}\n" +
   "})(function(ko, jQuery, undefined) { {SOURCE_CODE};\n return tkt; });\n";
 

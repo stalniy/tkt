@@ -75,5 +75,23 @@ var tkt = {
       cursor : cursor,
       field  : segments[i]
     }
+  },
+
+  removeFieldsIn: function (target, fields) {
+    var i = fields.length;
+    while (i--) {
+      var loc = tkt.valueLocationIn(target, fields[i]);
+
+      if (loc) {
+        delete loc.cursor[loc.field];
+      }
+    }
+    return target;
+  },
+
+  deepExtend: function () {
+    var args = Array.prototype.slice.call(arguments, 0);
+    args.unshift(true);
+    return $.extend.apply($, args);
   }
 };

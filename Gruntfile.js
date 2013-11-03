@@ -35,18 +35,18 @@ module.exports = function (grunt) {
 
       'ko.2.1.0': {
         src:  [ 'src/shim.js', 'src/utils.js', 'src/oop.js', 'src/bindings/*.js' ],
-        dest: 'build/tkt-raw.js'
+        dest: 'build/<%= pkg.name %>-raw.js'
       },
 
       'ko.2.2.0': {
         src:  [ 'src/shim.js', 'src/utils.js', 'src/oop.js', 'src/bindings/*.js', '!src/bindings/css.js' ],
-        dest: 'build/tkt-raw.js'
+        dest: 'build/<%= pkg.name %>-raw.js'
       }
     },
 
     build: {
       all: {
-        src: 'build/tkt-raw.js',
+        src: "<%= concat['ko.2.2.0'].dest %>",
         dest: 'build/tkt-<%= pkg.version %>.js',
         options: {
           banner:
@@ -65,7 +65,7 @@ module.exports = function (grunt) {
       },
       build: {
         files: {
-          'build/tkt-<%= pkg.version %>.min.js': ['build/tkt-<%= pkg.version %>.js']
+          'build/tkt.min.js': [ '<%= build.all.dest %>' ]
         }
       }
     }
