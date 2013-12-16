@@ -1,4 +1,6 @@
 var tkt = {
+  options: {},
+
   isValueBlank: function (value) {
     return typeof value === 'undefined'                 ||
       typeof value === 'string' && value.trim() === ""  ||

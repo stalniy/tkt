@@ -193,12 +193,12 @@ sharedExamplesFor("text formatter", function () {
 
   it ("allows to add custom formats", function () {
     var binding = ko.bindingHandlers[this.bindingName];
-    binding.addFormat('test', function (value) { return '*' + value + '*' });
+    binding.addDataFormat('test', function (value) { return '*' + value + '*' });
     bindings[this.bindingName] = 'string';
     bindings.showAs = 'test';
     ko.applyBindingsToNode(this.domNode, bindings);
     expect(this.domNode).toContainText('*string*');
-    binding.removeFormat('test');
+    binding.removeDataFormat('test');
   })
 
 });
@@ -206,6 +206,15 @@ sharedExamplesFor("text formatter", function () {
 describe("Content formatting for html and text bindings", function () {
   beforeEach(function () {
     this.domNode = document.createElement('div');
+  })
+
+  describe("by default", function () {
+    it ("can process nodes even if allBindingsAccessor parameter is missing", function () {
+      var domNode = this.domNode;
+      expect(function () {
+        ko.bindingHandlers.text.update(domNode, function () { return "test me"; });
+      }).not.toThrow();
+    })
   })
 
   describe("html binding", function () {

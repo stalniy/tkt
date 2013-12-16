@@ -1,4 +1,4 @@
-(function (ko) {
+(function (ko, tkt) {
   var unwrap = ko.utils.unwrapObservable;
   var formats = {
     price: function (v, options) {
@@ -52,23 +52,25 @@
     }
   };
 
-  function addFormat(name, formatter) {
+  function addDataFormat(name, formatter) {
     formats[name] = formatter;
     return this;
-  }
+  };
 
-  function removeFormat(name) {
+  function removeDataFormat(name) {
     if (formats[name]) {
       delete formats[name];
     }
-  }
+  };
 
-  function addFormaterIn(binding) {
-    binding.removeFormat = removeFormat;
-    binding.addFormat = addFormat;
+  tkt.options.formatBindingName = 'showAs';
+
+  tkt.addFormaterIn = function (binding) {
+    binding.addDataFormat = addDataFormat;
+    binding.removeDataFormat = removeDataFormat;
     binding.update = (function (_super) {
       return function (element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext) {
-        var bindings = allBindingsAccessor(), format = unwrap(bindings.showAs);
+        var bindings = allBindingsAccessor ? allBindingsAccessor() : {}, format = unwrap(bindings[tkt.options.formatBindingName]);
 
         if (formats[format]) {
           valueAccessor = formats[format].bind(formats, unwrap(valueAccessor()), bindings);
@@ -76,10 +78,10 @@
         _super(element, valueAccessor, allBindingsAccessor, viewModel, bindingsContext);
       }
     })(binding.update);
-  }
+  };
 
   var bindings = ['text', 'html'];
   ko.utils.arrayForEach(bindings, function (bindingName) {
-    addFormaterIn(ko.bindingHandlers[bindingName]);
+    tkt.addFormaterIn(ko.bindingHandlers[bindingName]);
   });
-})(ko);
+})(ko, tkt);
