@@ -23,9 +23,10 @@
 
       collected: function (element, context, event) {
         var config = domData.get(event.delegateTarget, collectedDefsKey);
+        var value  = this.config[this.name];
 
         if (!config) {
-          var config = parseCollectedConfig(this.value);
+          var config = parseCollectedConfig(value);
           domData.set(event.delegateTarget, collectedDefsKey, config);
         }
 
@@ -45,8 +46,9 @@
 
       data: function (element, context, event) {
         var domNode = $(element);
+        var value = this.config[this.name];
 
-        if (this.value === '*') {
+        if (value === '*') {
           var data = domNode.data();
 
           if (data.bind) {
@@ -54,7 +56,7 @@
           }
           return data;
         }
-        return domNode.data(this.value) || domNode.attr(this.value);
+        return domNode.data(value) || domNode.attr(value);
       },
 
       'default': function (element, context, event) {
@@ -75,20 +77,23 @@
   ko.bindingHandlers.on = binding;
 
 
-  var defaultValueBuilder = { buildFrom: binding.valueDefs['default'] };
-
   function detectBuilderFrom(config) {
     var defs = binding.valueDefs;
     for (var defName in defs) {
       if (defs.hasOwnProperty(defName) && defName in config) {
         return {
           buildFrom : defs[defName],
-          value     : config[defName]
+          name      : defName,
+          config    : config
         }
       }
     }
 
-    return defaultValueBuilder;
+    return {
+      name      : 'default',
+      buildFrom : binding.valueDefs['default'],
+      config    : config
+    };
   }
 
   function createEventHandlerFor(config, rule) {
@@ -116,6 +121,10 @@
 
       if (result !== true) {
         event.preventDefault();
+      }
+
+      if (builder.config.bubble === false) {
+        event.stopPropagation();
       }
     };
   }

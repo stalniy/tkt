@@ -24,7 +24,7 @@ module.exports = function (grunt) {
       },
 
       assembled: {
-        src: 'build/tkt-<%= pkg.version %>.min.js'
+        src: 'build/tkt.min.js'
       }
     },
 
@@ -47,7 +47,7 @@ module.exports = function (grunt) {
     build: {
       all: {
         src: "<%= concat['ko.2.2.0'].dest %>",
-        dest: 'build/tkt-<%= pkg.version %>.js',
+        dest: 'build/<%= pkg.name %>-<%= pkg.version %>.js',
         options: {
           banner:
             "/*! The knockout tools v<%= pkg.version %> | http://github/stalniy/tkt\n" +
@@ -78,7 +78,14 @@ module.exports = function (grunt) {
 
   grunt.loadTasks("build/tasks");
 
-  grunt.registerTask('default', ['bower', 'jasmine:source', 'concat:ko.2.2.0', 'build', 'uglify', 'jasmine:assembled']);
+  grunt.registerTask('default', [
+    'bower',
+    'jasmine:source',
+    'concat:ko.2.2.0',
+    'build',
+    'uglify',
+    'jasmine:assembled'
+  ]);
   grunt.registerTask('test', ['bower', 'jasmine:source']);
   grunt.registerTask("for-old-ko", ['bower', 'jasmine:source', 'concat:ko.2.1.0', 'build', 'uglify', 'jasmine:assembled'])
 };

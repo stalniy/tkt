@@ -40,6 +40,29 @@ describe("'on' binding", function () {
     }).toThrow()
   })
 
+  describe("event bubbling", function () {
+    var eventHandler, linkNode;
+
+    beforeEach(function () {
+      eventHandler = jasmine.createSpy("click event handler");
+      domNode.on('click', eventHandler);
+      linkNode = domNode.find('a:first');
+    })
+
+    it ("prevents event bubbling if 'bubble' is false", function () {
+      applyBindingTo(domNode, { 'click a': 'runHandler', bubble: false });
+      linkNode.trigger('click');
+      expect(eventHandler).not.toHaveBeenCalled();
+    })
+
+    it ("doesn't prevent event's bubbling", function () {
+      applyBindingTo(domNode, { 'click a': 'runHandler' });
+      linkNode.trigger('click');
+      expect(eventHandler).toHaveBeenCalled();
+    })
+  })
+
+
   describe("when event handler is called", function () {
     var eventPreventDefault;
     beforeEach(function () {
@@ -146,7 +169,7 @@ describe("'on' binding", function () {
     }
   })
 
-  describe ("when lookups for specified method", function () {
+  describe("when lookups for specified method", function () {
     it ("checks parent context", function () {
       scope.customMethod = noop;
       spyOn(scope, 'customMethod');
