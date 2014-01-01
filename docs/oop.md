@@ -85,8 +85,6 @@ var Product = Object.extend({
   initialize: function () {
     this.name = ko.observable();
     this.categoryId = ko.observable();
-
-    this.setUpMixins();
   },
 
   _updateAttributes: function (product) {
@@ -107,4 +105,4 @@ var Product = Object.extend({
 ```
 
 It's possible to specify several mixins and if they have methods with the same name then will be used the method of first one.
-Callig method `setUpMixins` we call `setUp` method in context of our instance (it means `this` refers to the instance which calls this method) for each mixin (if mixin doesn't have such method it will be skipped).
+Each mixin can have `setUp` method which is invoked for each instance of a class when it's created.

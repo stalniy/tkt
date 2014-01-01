@@ -4,41 +4,40 @@
   function classExtend(defs) {
     var
       parent = this.prototype,
-      initializer = this,
-      constructor = defs.initialize || function () { initializer.apply(this, arguments) },
-      prototype   = Object.create(parent)
+      initializer = defs.initialize || this,
+      prototype = Object.create(parent),
+      constructor = function () {
+        if (this._invokeMixins) {
+          this._invokeMixins('setUp');
+        }
+        initializer.apply(this, arguments);
+      }
     ;
 
-    if (defs.initialize) {
-      delete defs.initialize;
-    }
-
     if (defs.include) {
-      includeMixinsIn(prototype, defs.include);
+      var mixins = defs.include;
+      mixinIfUndefined(prototype, mixins);
       delete defs.include;
+      prototype._invokeMixins = function (method) {
+        var i = mixins.length;
+
+        while (i--) {
+          mixins[i][method] && mixins[i][method].call(this);
+        }
+      };
     }
 
     constructor.prototype = tkt.mixin(prototype, defs);
     constructor.prototype.constructor = constructor;
     constructor.extend  = classExtend;
     constructor.include = classInclude;
+
     return constructor;
   }
 
   function classInclude() {
     mixinIfUndefined(this.prototype, arguments);
     return this;
-  }
-
-  function includeMixinsIn(proto, mixins) {
-    mixinIfUndefined(proto, mixins).setUpMixins = function () {
-      var i = mixins.length;
-
-      while (i--) {
-        mixins[i].setUp && mixins[i].setUp.call(this);
-      }
-    };
-    return proto;
   }
 
   function mixinIfUndefined(object, mixins) {

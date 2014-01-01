@@ -85,14 +85,13 @@ describe("OOP syntax sugar", function () {
       expect(new Child().testMethod).toBeDefined();
     })
 
-    it ("defines setUpMixins method", function () {
-      expect(new Child().setUpMixins).toBeDefined();
+    it ("defines _invokeMixins method", function () {
+      expect(new Child()._invokeMixins).toBeDefined();
     })
 
-    it ("calls setUp method of each mixin when setUpMixins is called", function () {
+    it ("calls setUp method of each mixin when object is created", function () {
       var instance = new Child;
 
-      instance.setUpMixins();
       expect(mixin.setUp).toHaveBeenCalled();
       expect(anotherMixin.setUp).toHaveBeenCalled();
     })

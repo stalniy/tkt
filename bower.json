@@ -1,7 +1,7 @@
 {
   "name": "tkt",
-  "version": "0.0.3",
-  "main": "build/tkt-0.0.3.min.js",
+  "version": "0.0.4",
+  "main": "build/tkt.min.js",
   "ignore": [
     "**/.*",
     "node_modules",
