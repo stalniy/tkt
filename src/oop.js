@@ -19,6 +19,10 @@
       mixinIfUndefined(prototype, mixins);
       delete defs.include;
       prototype._invokeMixins = function (method) {
+        if (parent._invokeMixins) {
+          parent._invokeMixins.call(this, method);
+        }
+
         var i = mixins.length;
 
         while (i--) {
