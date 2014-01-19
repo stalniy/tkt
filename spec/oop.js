@@ -58,7 +58,7 @@ describe("OOP syntax sugar", function () {
   })
 
   describe("when 'include' property is specified", function () {
-    var mixin, anotherMixin, oneMoreMixin, Child;
+    var mixin, anotherMixin, oneMoreMixin, Child, SubChild;
     beforeEach(function () {
       mixin = {
         setUp      : jasmine.createSpy("setUp method of mixin"),
@@ -73,6 +73,7 @@ describe("OOP syntax sugar", function () {
       oneMoreMixin = {
         method: jasmine.createSpy("method of oneMoreMixin")
       };
+
 
       Child = Object.extend({
         include: [ mixin, anotherMixin, oneMoreMixin ],
@@ -102,6 +103,26 @@ describe("OOP syntax sugar", function () {
 
     it ("doesn't let mixins override own methods", function () {
       expect(new Child().method).not.toBe(oneMoreMixin.method);
+    })
+
+    describe("when child class has more than one inheritance level", function () {
+      var SubChild, subChildMixin, instance;
+      beforeEach(function () {
+        subChildMixin = { setUp: jasmine.createSpy("sub child mixin") };
+        SubChild = Child.extend({
+          include: [ subChildMixin ]
+        });
+        instance = new SubChild();
+      })
+
+      it ("calls setUp method of including mixins", function () {
+        expect(subChildMixin.setUp).toHaveBeenCalled();
+      })
+
+      it ("calls setUp of each parent mixin", function () {
+        expect(mixin.setUp).toHaveBeenCalled();
+        expect(anotherMixin.setUp).toHaveBeenCalled();
+      })
     })
   })
 })
