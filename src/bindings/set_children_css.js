@@ -1,29 +1,38 @@
-(function (ko) {
+(function (ko, $) {
   var cssBinding = ko.bindingHandlers.css;
 
-  ko.bindingHandlers.setChildrenCss = {
+  var binding = {
+    options: {
+      childIdentifierAttribute: 'data-name'
+    },
+
     update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var rules = valueAccessor(), updater;
 
       if (rules.call) {
-        var value, accessor = function () { return rules.call(viewModel, value) };
-        updater = function (child) {
-          value = ko.bindingHandlers.setChildrenCss.elementToValue(child);
-          cssBinding.update(child, accessor);
+        var value;
+        var accessor = function () {
+          return rules.call(viewModel, value)
+        };
+        updater = function (childElement) {
+          value = binding.identifierOf(childElement);
+          cssBinding.update(childElement, accessor);
         };
       } else {
-        updater = function (child) { cssBinding.update(child, valueAccessor) };
+        updater = function (childElement) {
+          cssBinding.update(childElement, valueAccessor)
+        };
       }
 
-      ko.utils.arrayForEach(element.childNodes, function (child) {
-        if (child.nodeType === 1) {
-          updater(child);
-        }
+      $(['[', binding.options.childIdentifierAttribute , ']'].join(''), element).each(function (i, childElement) {
+        updater(childElement);
       });
     },
 
-    elementToValue: function (element) {
-      return element.getAttribute('data-name');
+    identifierOf: function (element) {
+      return element.getAttribute(binding.options.childIdentifierAttribute);
     }
   };
-})(ko);
+
+  ko.bindingHandlers.setChildrenCss = binding;
+})(ko, $);

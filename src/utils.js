@@ -2,10 +2,11 @@ var tkt = {
   options: {},
 
   isValueBlank: function (value) {
-    return typeof value === 'undefined'                 ||
-      typeof value === 'string' && value.trim() === ""  ||
-      typeof value === 'object' && tkt.isObjectEmpty(value) ||
-      Array.isArray(value) && (value.length === 0 || typeof value[0] === 'undefined');
+    return typeof value === 'undefined' ||
+      value === null ||
+      typeof value === "string" && value.trim() === "" ||
+      Array.isArray(value) && (value.length === 0 || typeof value[0] === 'undefined') ||
+      typeof value === 'object' && tkt.isObjectEmpty(value);
   },
 
   isObjectEmpty: function (object) {
