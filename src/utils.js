@@ -6,7 +6,7 @@ var tkt = {
       value === null ||
       typeof value === "string" && value.trim() === "" ||
       Array.isArray(value) && (value.length === 0 || typeof value[0] === 'undefined') ||
-      typeof value === 'object' && tkt.isObjectEmpty(value);
+      typeof value === 'object' && !(value instanceof Date) && tkt.isObjectEmpty(value);
   },
 
   isObjectEmpty: function (object) {
