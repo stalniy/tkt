@@ -35,4 +35,6 @@
 
     return params;
   }
+
+  ko.virtualElements.allowedBindings.partial = true;
 })(ko);
