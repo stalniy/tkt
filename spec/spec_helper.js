@@ -1,4 +1,4 @@
-(function (jasmine) {
+(function (jasmine, $) {
   function domNodeText(node) {
     return 'textContent' in node ? node.textContent : node.innerText;
   }
@@ -48,11 +48,22 @@
   };
 
   var sharedExamples = {};
-  window.sharedExamplesFor = function (name, executor) {
-    sharedExamples[name] = executor;
-  };
 
-  window.itBehavesLike = function (sharedExampleName) {
-    jasmine.getEnv().describe("behaves like " + sharedExampleName, sharedExamples[sharedExampleName]);
-  };
-})(jasmine);
+  $.extend(window, {
+    sharedExamplesFor: function (name, executor) {
+      sharedExamples[name] = executor;
+    },
+
+    itBehavesLike: function (sharedExampleName) {
+      jasmine.getEnv().describe("behaves like " + sharedExampleName, sharedExamples[sharedExampleName]);
+    },
+
+    includeExamplesFor: function (sharedExampleName) {
+      var suite = jasmine.getEnv().currentSuite;
+      sharedExamples[sharedExampleName].call(suite);
+    }
+  });
+
+  window.context = window.describe;
+  window.includeExamples = window.includeExamplesFor;
+})(jasmine, jQuery);

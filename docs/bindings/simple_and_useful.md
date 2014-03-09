@@ -68,3 +68,14 @@ In cases when you want to preserve a part of html from applying bindings you can
 ```html
 <div data-bind="stopBinding: true"> my content which shouldn't use current context</div>
 ```
+
+### Partial
+
+`partial` binding implements more readable interface for `template` binding. For example:
+```html
+<div data-bind="partial: { name: 'my.template', var1: 1, var2: 2 }"></div>
+```
+have the same effect as:
+```html
+<div data-bind="template: { name: 'my.template', data: { var1: 1, var2: 2 } }"></div>
+```
