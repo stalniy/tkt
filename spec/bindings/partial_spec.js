@@ -12,37 +12,48 @@ sharedExamplesFor('partial binding method', function () {
   })
 
   it ('converts passed object for template binding', function () {
-    var params = { name: 'test', var1: true, var2: 'here' };
+    var fn = function () {};
+    var params = { name: 'test', var1: true, var2: 'here', 'if': true, afterRender: fn };
     ko.applyBindingsToNode(this.element, { partial: params });
 
     expect(this.bindingMethod.mostRecentCall.args[1]()).toEqual({
       name: params.name,
-      data: { var1: params.var1, var2: params.var2 }
+      data: { var1: params.var1, var2: params.var2 },
+      'if': true,
+      afterRender: fn
     });
   })
 
 });
 
 describe('"Partial" binding', function () {
+  var templateBinding;
 
   beforeEach(function () {
     this.element = document.createElement('div');
     document.body.appendChild(this.element);
 
-    var templateBinding = ko.bindingHandlers.template;
+    templateBinding = ko.bindingHandlers.template;
     spyOn(templateBinding, 'init');
     spyOn(templateBinding, 'update');
   })
 
-  describe('when is initialized', function () {
+  describe('when "init" method is called', function () {
     beforeEach(function () {
       this.bindingMethod = ko.bindingHandlers.template.init;
     })
 
     includeExamplesFor('partial binding method');
+
+    it ('receives the same arguments as "update" method', function () {
+      var params = { name: 'test', var1: 1, var2: 2 };
+      ko.applyBindingsToNode(this.element, { partial: params });
+
+      expect(templateBinding.init.mostRecentCall.args[1]()).toEqual(templateBinding.update.mostRecentCall.args[1]());
+    })
   })
 
-  describe('when is updated', function () {
+  describe('when "update" method is called', function () {
     beforeEach(function () {
       this.bindingMethod = ko.bindingHandlers.template.update;
     })

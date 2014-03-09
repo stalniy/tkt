@@ -1,5 +1,6 @@
 (function (ko) {
   var templateBinding = ko.bindingHandlers.template;
+  var reservedOptions = 'name afterRender afterAdd beforeRemove as if foreach'.split(' ');
 
   ko.bindingHandlers.partial = {
     init: function (element, valueAccessor) {
@@ -19,14 +20,17 @@
 
   function extractArguments(params) {
     if (typeof params === 'object' && params !== null) {
-      params = ko.toJS(params);
-      var name = params.name;
+      var templateParams = {};
+      params = tkt.mixin({}, params);
+      ko.utils.arrayForEach(reservedOptions, function (option) {
+        if (option in params) {
+          templateParams[option] = params[option];
+          delete params[option];
+        }
+      });
 
-      if (name) {
-        delete params.name;
-      }
-
-      params = { name: name, data: params };
+      templateParams.data = params;
+      params = templateParams;
     }
 
     return params;
