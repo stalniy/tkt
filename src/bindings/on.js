@@ -107,12 +107,13 @@
       var element  = event.currentTarget;
       var context  = ko.contextFor(this);
       var scopes   = context.$parents.slice(0);
-      var position = domData.get(element, contextPositionKey);
+      var positionCacheKey = event.type + methodName + contextPositionKey;
+      var position = domData.get(element, positionCacheKey);
 
       scopes.unshift(context.$data);
       if (!position) {
         position = getPositionOfContextWith(methodName, scopes);
-        domData.set(element, contextPositionKey, position);
+        domData.set(element, positionCacheKey, position);
       }
 
       var scope = scopes[position];
