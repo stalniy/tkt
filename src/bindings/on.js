@@ -103,7 +103,7 @@
 
     config = rule = null;
 
-    return function (event) {
+    var eventHandler = function (event) {
       var element  = event.currentTarget;
       var context  = ko.contextFor(this);
       var scopes   = context.$parents.slice(0);
@@ -128,6 +128,18 @@
         event.stopPropagation();
       }
     };
+
+    if (builder.config.delay) {
+      var timerId;
+      var originalEventHandler = eventHandler;
+
+      eventHandler = function (event) {
+        clearTimeout(timerId);
+        timerId = setTimeout(originalEventHandler.bind(this, event), builder.config.delay);
+      };
+    }
+
+    return eventHandler;
   }
 
   function removeEventHandlers(element) {

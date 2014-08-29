@@ -1,6 +1,6 @@
 {
   "name": "tkt",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "The knockout tools: common bindings and useful utilities",
   "scripts": {
     "test": "grunt test"
