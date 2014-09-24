@@ -104,6 +104,10 @@
     config = rule = null;
 
     var eventHandler = function (event) {
+      if ('ignore' in builder.config && $(event.target).closest(builder.config.ignore).size() > 0) {
+        return;
+      }
+
       var element  = event.currentTarget;
       var context  = ko.contextFor(this);
       var scopes   = context.$parents.slice(0);

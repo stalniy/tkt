@@ -169,6 +169,29 @@ describe("'on' binding", function () {
     }
   })
 
+  describe('when "ignore" option is specified', function () {
+    beforeEach(function () {
+      domNode.html([
+        '<div class="wrapper">',
+          '<h1>test</h1>',
+          '<span>me</span>',
+        '</div>'
+      ].join(''));
+    })
+
+    it ('does not call the event handler', function () {
+      var scope = jasmine.createSpyObj('view model', [ 'chooseItem' ]);
+
+      applyBindingTo(domNode, { 'click .wrapper': 'chooseItem', ignore: 'h1' }, scope);
+      domNode.find('.wrapper').click();
+      domNode.find('h1').click();
+      domNode.find('.wrapper span').click();
+
+
+      expect(scope.chooseItem.calls.length).toBe(2);
+    })
+  })
+
   describe("when lookups for specified method", function () {
     it ("checks parent context", function () {
       scope.customMethod = noop;
