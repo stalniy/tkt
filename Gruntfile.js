@@ -51,7 +51,7 @@ module.exports = function (grunt) {
         options: {
           banner:
             "/*! The knockout tools v<%= pkg.version %> | http://github/stalniy/tkt\n" +
-            "(c) 20013 Sergiy Stotskiy <sergiy.stotskiy@freaksidea.com> \n" +
+            "(c) 2013-2014 Sergiy Stotskiy <sergiy.stotskiy@freaksidea.com> \n" +
             "MIT license */\n"
         }
       }
